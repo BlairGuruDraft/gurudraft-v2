@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useState } from 'react';
-import Navbar from '../components/Navbar';
+import Navbar from './Navbar';
 
 const SAMPLE_POSTS = [
   { id:1, author:'TravisK', initials:'TK', time:'2h ago', sport:'🏈 Football', title:'Anyone starting Jaylen Waddle this week?', body:"He's been inconsistent but the matchup vs the Jets secondary looks great. Thinking of starting him over Diontae.", likes:14, replies:8 },
