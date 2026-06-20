@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import Navbar from '../components/Navbar';
+import Navbar from '../Navbar';
 
 const PICKS = {
   football: [
