@@ -2,7 +2,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import Navbar from './Navbar';
 
-async function handleCheckout(plan) {
+export default function Home() {
+  async function handleCheckout(plan) {
     try {
       const priceId =
         plan === 'annual'
@@ -10,7 +11,6 @@ async function handleCheckout(plan) {
           : process.env.NEXT_PUBLIC_STRIPE_LIFETIME_PRICE_ID;
 
       console.log('Price ID:', priceId);
-      console.log('Plan:', plan);
 
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
@@ -18,9 +18,8 @@ async function handleCheckout(plan) {
         body: JSON.stringify({ priceId, plan }),
       });
 
-      console.log('Response status:', res.status);
       const data = await res.json();
-      console.log('Response data:', data);
+      console.log('Response:', data);
 
       if (data.url) {
         window.location.href = data.url;
@@ -28,15 +27,8 @@ async function handleCheckout(plan) {
         alert('Error: ' + (data.error || 'Unknown error'));
       }
     } catch (err) {
-      console.error('Checkout error:', err);
       alert('Error: ' + err.message);
     }
-  }
-      body: JSON.stringify({ priceId, plan }),
-    });
-
-    const data = await res.json();
-    if (data.url) window.location.href = data.url;
   }
 
   return (
@@ -94,8 +86,8 @@ async function handleCheckout(plan) {
           <p className="section-sub">Not just data dumps. Actual advice, from a community that knows the game.</p>
           <div className="features-grid">
             {[
-              {icon:'🧙',title:'Guru Picks',desc:'Weekly curated picks and start/sit decisions across every sport - no guesswork.'},
-              {icon:'👥',title:'Community Hub',desc:'Connect with thousands of members. Share lineups, debate picks, get real answers.'},
+              {icon:'🧙',title:'Guru Picks',desc:'Weekly curated picks and start/sit decisions across every sport.'},
+              {icon:'👥',title:'Community Hub',desc:'Connect with thousands of members. Share lineups, debate picks.'},
               {icon:'📊',title:'Deep Analysis',desc:'Matchup breakdowns, trend reports, and injury impact analysis.'},
               {icon:'⚡',title:'Real-Time Alerts',desc:'Injury updates, lineup changes, and waiver wire targets instantly.'},
               {icon:'🏆',title:'All Formats',desc:'Season-long, daily fantasy, best ball, dynasty - all covered.'},
