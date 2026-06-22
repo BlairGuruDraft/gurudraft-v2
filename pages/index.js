@@ -2,16 +2,36 @@ import Head from 'next/head';
 import Link from 'next/link';
 import Navbar from './Navbar';
 
-export default function Home() {
-  async function handleCheckout(plan) {
-    const priceId =
-      plan === 'annual'
-        ? process.env.NEXT_PUBLIC_STRIPE_ANNUAL_PRICE_ID
-        : process.env.NEXT_PUBLIC_STRIPE_LIFETIME_PRICE_ID;
+async function handleCheckout(plan) {
+    try {
+      const priceId =
+        plan === 'annual'
+          ? process.env.NEXT_PUBLIC_STRIPE_ANNUAL_PRICE_ID
+          : process.env.NEXT_PUBLIC_STRIPE_LIFETIME_PRICE_ID;
 
-    const res = await fetch('/api/stripe/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      console.log('Price ID:', priceId);
+      console.log('Plan:', plan);
+
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId, plan }),
+      });
+
+      console.log('Response status:', res.status);
+      const data = await res.json();
+      console.log('Response data:', data);
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Error: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      alert('Error: ' + err.message);
+    }
+  }
       body: JSON.stringify({ priceId, plan }),
     });
 
