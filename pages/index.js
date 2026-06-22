@@ -1,125 +1,82 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { useSession, signOut } from 'next-auth/react';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 import Navbar from './Navbar';
 
-const PICKS = {
-  football: [
-    { name: 'Tyreek Hill', detail: 'WR1 vs NE · PPR', grade: 'A+' },
-    { name: 'Bijan Robinson', detail: 'RB1 vs CAR · Start', grade: 'A' },
-    { name: 'Nico Collins', detail: 'WR2 sleeper · DFS value', grade: 'A-' },
-  ],
-  baseball: [
-    { name: 'Paul Skenes', detail: 'SP vs CIN · Stream', grade: 'A+' },
-    { name: 'Bobby Witt Jr.', detail: 'SS1 · Hot streak', grade: 'A' },
-    { name: 'Corbin Carroll', detail: 'OF · Bounce-back spot', grade: 'B+' },
-  ],
-  basketball: [
-    { name: 'Shai Gilgeous-Alexander', detail: 'PG1 · Full go', grade: 'A+' },
-    { name: 'Chet Holmgren', detail: 'C · Blocks upside', grade: 'A' },
-    { name: 'Desmond Bane', detail: 'SG · 3PT upside', grade: 'B+' },
-  ],
-  hockey: [
-    { name: 'Nathan MacKinnon', detail: 'C · PP1 · Must start', grade: 'A+' },
-    { name: 'Andrei Vasilevskiy', detail: 'G · Home start', grade: 'A' },
-    { name: 'Nikita Kucherov', detail: 'RW · Hot line', grade: 'A' },
-  ],
-  golf: [
-    { name: 'Scottie Scheffler', detail: 'World #1 · Course fit A+', grade: 'A+' },
-    { name: 'Collin Morikawa', detail: 'Ball striker · Value play', grade: 'A-' },
-    { name: 'Tom Kim', detail: 'Bermuda specialist · DFS GPP', grade: 'B+' },
-  ],
-};
+export default function Home() {
+  async function handleCheckout(plan) {
+    const priceId =
+      plan === 'annual'
+        ? process.env.NEXT_PUBLIC_STRIPE_ANNUAL_PRICE_ID
+        : process.env.NEXT_PUBLIC_STRIPE_LIFETIME_PRICE_ID;
 
-export default function Dashboard() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+    const res = await fetch('/api/stripe/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ priceId, plan }),
+    });
 
-  useEffect(() => {
-    if (status === 'unauthenticated') router.push('/login');
-  }, [status, router]);
-
-  if (status === 'loading') {
-    return (
-      <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}>
-        <p style={{color:'var(--gray-400)'}}>Loading...</p>
-      </div>
-    );
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
   }
-
-  if (!session) return null;
-
-  const sports = [
-    { key: 'football', label: 'Football' },
-    { key: 'baseball', label: 'Baseball' },
-    { key: 'basketball', label: 'Basketball' },
-    { key: 'hockey', label: 'Hockey' },
-    { key: 'golf', label: 'Golf' },
-  ];
 
   return (
     <>
-      <Head><title>Dashboard - GuruDraft</title></Head>
+      <Head>
+        <title>GuruDraft - Draft Smarter. Win Bigger.</title>
+        <meta name="description" content="The ultimate fantasy sports platform. All 5 sports, guru-level advice, community-driven." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
       <Navbar />
-      <div className="dashboard-layout">
-        <aside className="sidebar">
-          <div className="sidebar-section">
-            <div className="sidebar-label">Menu</div>
-            <Link href="/dashboard" className="sidebar-link active">Dashboard</Link>
-            <Link href="/community" className="sidebar-link">Community</Link>
+      <section className="hero">
+        <div>
+          <span className="hero-eyebrow">Fantasy Sports Platform</span>
+          <h1>Draft Smarter.<br /><span className="gold">Win Bigger.</span></h1>
+          <p className="hero-sub">Guru-level picks, rankings, and strategy across all 5 major sports. Built for winners. Backed by community.</p>
+          <div className="hero-cta">
+            <button className="btn btn-gold btn-large" onClick={() => handleCheckout('annual')}>Start Winning - $97/yr</button>
+            <Link href="#features" className="btn btn-outline btn-large">See How It Works</Link>
           </div>
-          <div className="sidebar-section">
-            <div className="sidebar-label">Sports</div>
-            {sports.map((s) => (
-              <Link key={s.key} href={'/dashboard#' + s.key} className="sidebar-link">{s.label}</Link>
+          <div className="hero-sports">
+            {[{icon:'🏈',label:'Football'},{icon:'⚾',label:'Baseball'},{icon:'🏀',label:'Basketball'},{icon:'🏒',label:'Hockey'},{icon:'⛳',label:'Golf'}].map((s) => (
+              <div key={s.label} className="sport-pill"><span className="icon">{s.icon}</span><span>{s.label}</span></div>
             ))}
           </div>
-          <div className="sidebar-section">
-            <div className="sidebar-label">Account</div>
-            <button className="sidebar-link" onClick={() => signOut({ callbackUrl: '/' })} style={{background:'none',border:'none',width:'100%',textAlign:'left',cursor:'pointer'}}>
-              Sign Out
-            </button>
-          </div>
-        </aside>
-        <main className="dashboard-main">
-          <div className="dashboard-header">
-            <h1>Welcome back, {session.user?.name || 'Guru'}</h1>
-            <p>Here are this week's top picks across all 5 sports.</p>
-          </div>
-          <div className="card-grid">
-            <div className="stat-card">
-              <div className="label">Sports Covered</div>
-              <div className="value">5</div>
-            </div>
-            <div className="stat-card">
-              <div className="label">This Week's Picks</div>
-              <div className="value">15</div>
-            </div>
-            <div className="stat-card">
-              <div className="label">Membership</div>
-              <div className="value" style={{fontSize:'1.25rem',textTransform:'capitalize'}}>{session.user?.plan || 'Annual'}</div>
-            </div>
-          </div>
-          <div id="picks">
-            {sports.map((sport) => (
-              <div key={sport.key} className="picks-section" id={sport.key}>
-                <h2>{sport.label} - Top Picks</h2>
-                {PICKS[sport.key].map((pick) => (
-                  <div key={pick.name} className="pick-item">
-                    <div>
-                      <div className="pick-name">{pick.name}</div>
-                      <div className="pick-detail">{pick.detail}</div>
-                    </div>
-                    <div className="pick-grade">{pick.grade}</div>
-                  </div>
-                ))}
+        </div>
+      </section>
+      <hr className="divider" />
+      <div id="sports">
+        <div className="section section-center">
+          <p className="section-eyebrow">All 5 Sports Covered</p>
+          <h2>One Membership. Every Season.</h2>
+          <p className="section-sub">From August football drafts to Masters weekend - GuruDraft has you covered year-round.</p>
+          <div className="sports-grid">
+            {[
+              {emoji:'🏈',name:'Football',desc:'Draft boards, lineup optimizer, weekly rankings and waiver wire'},
+              {emoji:'⚾',name:'Baseball',desc:'Pitcher and hitter analysis, streaming targets, trade advice'},
+              {emoji:'🏀',name:'Basketball',desc:'Nightly DFS picks, season-long strategy, rest-day alerts'},
+              {emoji:'🏒',name:'Hockey',desc:'Goalie starts, power-play unit tracking, hot-streak alerts'},
+              {emoji:'⛳',name:'Golf',desc:'DraftKings and FanDuel lineup builder, course matchup breakdowns'},
+            ].map((s) => (
+              <div key={s.name} className="sport-card">
+                <div className="sport-emoji">{s.emoji}</div>
+                <h3>{s.name}</h3>
+                <p>{s.desc}</p>
               </div>
             ))}
           </div>
-        </main>
+        </div>
       </div>
-    </>
-  );
-}
+      <hr className="divider" />
+      <div id="features">
+        <div className="section section-center">
+          <p className="section-eyebrow">Why GuruDraft</p>
+          <h2>Built for Serious Players</h2>
+          <p className="section-sub">Not just data dumps. Actual advice, from a community that knows the game.</p>
+          <div className="features-grid">
+            {[
+              {icon:'🧙',title:'Guru Picks',desc:'Weekly curated picks and start/sit decisions across every sport - no guesswork.'},
+              {icon:'👥',title:'Community Hub',desc:'Connect with thousands of members. Share lineups, debate picks, get real answers.'},
+              {icon:'📊',title:'Deep Analysis',desc:'Matchup breakdowns, trend reports, and injury impact analysis delivered fresh.'},
+              {icon:'⚡',title:'Real-Time Alerts',desc:'Injury updates, lineup changes, and waiver wire targets pushed to you instantly.'},
+              {icon:'🏆',title:'All Formats',desc:'Season-long, daily fantasy, best ball, dynasty - we cover every format you play.'},
+              {icon:'📱',title:'Any
