@@ -76,7 +76,54 @@ export default function Home() {
             {[
               {icon:'🧙',title:'Guru Picks',desc:'Weekly curated picks and start/sit decisions across every sport - no guesswork.'},
               {icon:'👥',title:'Community Hub',desc:'Connect with thousands of members. Share lineups, debate picks, get real answers.'},
-              {icon:'📊',title:'Deep Analysis',desc:'Matchup breakdowns, trend reports, and injury impact analysis delivered fresh.'},
-              {icon:'⚡',title:'Real-Time Alerts',desc:'Injury updates, lineup changes, and waiver wire targets pushed to you instantly.'},
-              {icon:'🏆',title:'All Formats',desc:'Season-long, daily fantasy, best ball, dynasty - we cover every format you play.'},
-              {icon:'📱',title:'Any
+              {icon:'📊',title:'Deep Analysis',desc:'Matchup breakdowns, trend reports, and injury impact analysis.'},
+              {icon:'⚡',title:'Real-Time Alerts',desc:'Injury updates, lineup changes, and waiver wire targets instantly.'},
+              {icon:'🏆',title:'All Formats',desc:'Season-long, daily fantasy, best ball, dynasty - all covered.'},
+              {icon:'📱',title:'Any Device',desc:'Desktop or mobile - your picks are always a tap away.'},
+            ].map((f) => (
+              <div key={f.title} className="feature-card">
+                <div className="feature-icon">{f.icon}</div>
+                <h3>{f.title}</h3>
+                <p>{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <hr className="divider" />
+      <div id="pricing">
+        <div className="section section-center">
+          <p className="section-eyebrow">Pricing</p>
+          <h2>Simple. Straightforward. Worth It.</h2>
+          <p className="section-sub">One price. All 5 sports. No hidden fees.</p>
+          <div className="pricing-wrapper">
+            <div className="pricing-card featured">
+              <div className="pricing-badge">Most Popular</div>
+              <div className="pricing-name">Annual Membership</div>
+              <div className="pricing-price"><sup>$</sup>97</div>
+              <div className="pricing-period">per year - cancel anytime</div>
+              <ul className="pricing-features">
+                {['All 5 sports covered','Weekly Guru picks and rankings','Community hub access','Real-time alerts','All formats supported','New features included'].map((f) => (
+                  <li key={f}><span className="check">✓</span> {f}</li>
+                ))}
+              </ul>
+              <button className="btn btn-gold" style={{width:'100%'}} onClick={() => handleCheckout('annual')}>Get Started</button>
+            </div>
+          </div>
+          <p style={{marginTop:'1.5rem',color:'var(--gray-600)',fontSize:'0.85rem'}}>Secured by Stripe. Cancel anytime. Email us at support@gurudraft.com</p>
+        </div>
+      </div>
+      <hr className="divider" />
+      <footer className="footer">
+        <div className="footer-logo">GURUDRAFT</div>
+        <p style={{marginBottom:'1rem'}}>Draft Smarter. Win Bigger.</p>
+        <div style={{display:'flex',gap:'2rem',justifyContent:'center',marginBottom:'1.5rem',flexWrap:'wrap'}}>
+          <Link href="/privacy" style={{color:'var(--gray-600)'}}>Privacy Policy</Link>
+          <Link href="/terms" style={{color:'var(--gray-600)'}}>Terms of Service</Link>
+          <a href="mailto:support@gurudraft.com" style={{color:'var(--gray-600)'}}>Support</a>
+        </div>
+        <p>2026 GuruDraft. All rights reserved.</p>
+      </footer>
+    </>
+  );
+}
