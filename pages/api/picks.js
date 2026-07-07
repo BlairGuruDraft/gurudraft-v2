@@ -55,7 +55,7 @@ export default async function handler(req, res) {
 
     try {
       await put(PICKS_KEY, JSON.stringify(picks), {
-        access: 'private',
+        access: 'public',
         token: process.env.BLOB_READ_WRITE_TOKEN,
         allowOverwrite: true,
       });
