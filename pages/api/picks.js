@@ -1,4 +1,4 @@
-import { put, get } from '@vercel/blob';
+import { put, list } from '@vercel/blob';
 
 const PICKS_KEY = 'gurudraft-picks.json';
 
@@ -33,13 +33,15 @@ const DEFAULT_PICKS = {
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
-      const response = await fetch(`https://${process.env.BLOB_STORE_ID}.public.blob.vercel-storage.com/${PICKS_KEY}`);
-      if (response.ok) {
+      const { blobs } = await list({ token: process.env.BLOB_READ_WRITE_TOKEN });
+      const picksBlob = blobs.find(b => b.pathname === PICKS_KEY);
+      if (picksBlob) {
+        const response = await fetch(picksBlob.url);
         const picks = await response.json();
         return res.status(200).json(picks);
       }
     } catch (e) {
-      console.log('No picks file yet, returning defaults');
+      console.log('No picks file yet, returning defaults:', e.message);
     }
     return res.status(200).json(DEFAULT_PICKS);
   }
@@ -53,7 +55,7 @@ export default async function handler(req, res) {
 
     try {
       await put(PICKS_KEY, JSON.stringify(picks), {
-        access: 'public',
+        access: 'private',
         token: process.env.BLOB_READ_WRITE_TOKEN,
         allowOverwrite: true,
       });
